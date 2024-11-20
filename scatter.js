@@ -87,13 +87,28 @@ function createScatterPlot(selector, data) {
         .on("mouseout", function (event, d) {
             d3.select(this).attr("fill", "steelblue").attr("r", 4);
         });
-
+    // Add X axis and label
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
+    
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 5)
+        .style("text-anchor", "middle")
+        .text("Sales")
+        .attr("clip-path", "none");
 
     svg.append("g")
         .call(d3.axisLeft(y));
+        
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(height / 2))
+        .attr("y", -margin.left + 11)
+        .style("text-anchor", "middle")
+        .text("Profit")
+        .attr("clip-path", "none"); // Prevent clipping
 }
 
 // Dados para gráfico de dispersão

@@ -1,61 +1,33 @@
 const heightInput = document.getElementById('height-input');
-const widthInput = document.getElementById('width-input'); 
+const widthInput = document.getElementById('width-input');
 const marginInput = document.getElementById('margin-input');
+const categoryInput = document.getElementById('category-input');
+const valueInput = document.getElementById('value-input');
+const addDataButton = document.getElementById('add-data-button');
+const createNewChartButton = document.getElementById('create-new-chart-button');
+const additionalChartsContainer = document.getElementById('additional-charts-container');
 
-let margin = {top: 20, right: 30, bottom: 30, left: 40};
+let margin = { top: 20, right: 30, bottom: 30, left: 40 };
 let width = 1000 - margin.left - margin.right;
 let height = 600 - margin.top - margin.bottom;
 
-heightInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    height = 600 - margin.top - margin.bottom;
-    d3.select("#chart-bar svg").remove();
-    createBarChart("#chart-bar", barData);
-  } else {
-    const newHeight = parseInt(e.target.value);
-    if (!isNaN(newHeight)) {
-      height = newHeight - margin.top - margin.bottom;
-      d3.select("#chart-bar svg").remove();
-      createBarChart("#chart-bar", barData);
-    }
-  }
-});
+let barData = [
+    { category: "A", value: 30 },
+    { category: "B", value: 80 },
+    { category: "C", value: 45 },
+    { category: "D", value: 60 },
+    { category: "E", value: 20 },
+    { category: "F", value: 90 }
+];
 
-widthInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    width = 1000 - margin.left - margin.right;
-    d3.select("#chart-bar svg").remove();
-    createBarChart("#chart-bar", barData);
-  } else {
-    const newWidth = parseInt(e.target.value);
-    if (!isNaN(newWidth)) {
-      width = newWidth - margin.left - margin.right;
-      d3.select("#chart-bar svg").remove();
-      createBarChart("#chart-bar", barData);
-    }
-  }
-});
+// Função para criar o gráfico de barras
+function createBarChart(selector, data, config = {}) {
+    const { width = 1000, height = 600, margin = { top: 20, right: 30, bottom: 50, left: 50 } } = config;
 
-marginInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    margin = {top: 20, right: 30, bottom: 30, left: 40};
-    width = 1000 - margin.left - margin.right;
-    height = 600 - margin.top - margin.bottom;
-    d3.select("#chart-bar svg").remove();
-    createBarChart("#chart-bar", barData);
-  } else {
-    const newMargin = parseInt(e.target.value);
-    if (!isNaN(newMargin)) {
-      margin = {top: newMargin, right: newMargin, bottom: newMargin, left: newMargin};
-      width = parseInt(widthInput.value || 1000) - margin.left - margin.right;
-      height = parseInt(heightInput.value || 600) - margin.top - margin.bottom;
-      d3.select("#chart-bar svg").remove();
-      createBarChart("#chart-bar", barData);
-    }
-  }
-});
+    // Remover gráfico anterior, se houver
+    d3.select(selector).select("svg").remove();
 
-function createBarChart(selector, data) {
+    // Criar SVG e o grupo principal
     const svg = d3.select(selector)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -63,6 +35,7 @@ function createBarChart(selector, data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Definir as escalas
     const x = d3.scaleBand()
         .domain(data.map(d => d.category))
         .range([0, width])
@@ -73,6 +46,7 @@ function createBarChart(selector, data) {
         .nice()
         .range([height, 0]);
 
+    // Criar as barras
     svg.append("g")
         .selectAll(".bar")
         .data(data)
@@ -81,11 +55,20 @@ function createBarChart(selector, data) {
         .attr("x", d => x(d.category))
         .attr("y", d => y(d.value))
         .attr("height", d => height - y(d.value))
-        .attr("width", x.bandwidth());
+        .attr("width", x.bandwidth())
+        .attr("fill", "steelblue")
+        .on("mouseover", function () {
+            d3.select(this).attr("fill", "orange");
+        })
+        .on("mouseout", function () {
+            d3.select(this).attr("fill", "steelblue");
+        });
 
+    // Eixo Y
     svg.append("g")
         .call(d3.axisLeft(y));
     
+    // Texto do Eixo Y
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
@@ -94,23 +77,178 @@ function createBarChart(selector, data) {
         .style("text-anchor", "middle")
         .text("Valor");
 
+    // Eixo X
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
     
+    // Texto do Eixo X
     svg.append("text")
-        .attr("transform", `translate(${width/2}, ${height + margin.bottom - 10})`)
+        .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
         .style("text-anchor", "middle")
         .text("Categoria");
 }
 
-const barData = [
-    {category: "A", value: 30},
-    {category: "B", value: 80},
-    {category: "C", value: 45},
-    {category: "D", value: 60},
-    {category: "E", value: 20},
-    {category: "F", value: 90}
-];
+// Inicializar gráfico com as configurações iniciais
+createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
 
-createBarChart("#chart-bar", barData);
+// Eventos para atualizar as dimensões do gráfico dinamicamente
+heightInput.addEventListener('change', (e) => {
+    const newHeight = parseInt(e.target.value);
+    if (!isNaN(newHeight)) {
+        height = newHeight - margin.top - margin.bottom;
+        createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
+    }
+});
+
+widthInput.addEventListener('change', (e) => {
+    const newWidth = parseInt(e.target.value);
+    if (!isNaN(newWidth)) {
+        width = newWidth - margin.left - margin.right;
+        createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
+    }
+});
+
+marginInput.addEventListener('change', (e) => {
+    const newMargin = parseInt(e.target.value);
+    if (!isNaN(newMargin)) {
+        margin = { top: newMargin, right: newMargin, bottom: newMargin, left: newMargin };
+        width = parseInt(widthInput.value || 1000) - margin.left - margin.right;
+        height = parseInt(heightInput.value || 600) - margin.top - margin.bottom;
+        createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
+    }
+});
+
+// Adicionar dados ao gráfico via input
+addDataButton.addEventListener('click', () => {
+    const newCategory = categoryInput.value.trim();
+    const newValue = parseFloat(valueInput.value);
+
+    if (newCategory && !isNaN(newValue)) {
+        // Verificar se a categoria já existe, se existir, atualizar o valor
+        const existingData = barData.find(d => d.category === newCategory);
+        if (existingData) {
+            existingData.value = newValue;
+        } else {
+            barData.push({ category: newCategory, value: newValue });
+        }
+        createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
+
+        // Limpar os inputs
+        categoryInput.value = '';
+        valueInput.value = '';
+    } else {
+        alert("Por favor, insira uma categoria válida e um valor numérico.");
+    }
+});
+
+// Função para criar novos gráficos de maneira independente
+createNewChartButton.addEventListener('click', () => {
+    // Criar um novo contêiner para o novo gráfico e seus inputs
+    const newChartContainer = document.createElement('div');
+    newChartContainer.className = 'chart-container';
+    newChartContainer.innerHTML = `
+        <div class="chart-config-inputs-holder">
+            <span class="chart-config-inputs-holder__title">Configurações do gráfico |</span>
+            <div class="chart-config-inputs-holder__input">
+              <label>Altura:</label>
+              <input type="text" class="height-input" value="600" placeholder="600" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label>Largura:</label>
+              <input type="text" class="width-input" value="1000" placeholder="1000" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label>Margem:</label>
+              <input type="text" class="margin-input" value="20" placeholder="20" />
+            </div>
+        </div>
+        <div class="chart-data-inputs-holder">
+            <span class="chart-config-inputs-holder__title">Adicionar Dados ao Gráfico |</span>
+            <div class="chart-config-inputs-holder__input">
+              <label>Categoria:</label>
+              <input type="text" class="category-input" placeholder="Categoria" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label>Valor:</label>
+              <input type="number" class="value-input" placeholder="Valor" />
+            </div>
+            <button type="button" class="add-data-button">Adicionar ao Gráfico</button>
+        </div>
+        <div class="chart-holder"></div>
+    `;
+    additionalChartsContainer.appendChild(newChartContainer);
+
+    // Dados iniciais para o novo gráfico
+    const newChartData = [
+        { category: "X", value: 40 },
+        { category: "Y", value: 70 },
+        { category: "Z", value: 50 }
+    ];
+
+    // Selecionar elementos do novo gráfico
+    const chartHolder = newChartContainer.querySelector('.chart-holder');
+    const newHeightInput = newChartContainer.querySelector('.height-input');
+    const newWidthInput = newChartContainer.querySelector('.width-input');
+    const newMarginInput = newChartContainer.querySelector('.margin-input');
+    const newCategoryInput = newChartContainer.querySelector('.category-input');
+    const newValueInput = newChartContainer.querySelector('.value-input');
+    const newAddDataButton = newChartContainer.querySelector('.add-data-button');
+
+    let newMargin = { top: 20, right: 30, bottom: 30, left: 40 };
+    let newWidth = 1000 - newMargin.left - newMargin.right;
+    let newHeight = 600 - newMargin.top - newMargin.bottom;
+
+    // Criar o novo gráfico
+    createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+
+    // Eventos para atualizar as dimensões do novo gráfico dinamicamente
+    newHeightInput.addEventListener('change', (e) => {
+        const updatedHeight = parseInt(e.target.value);
+        if (!isNaN(updatedHeight)) {
+            newHeight = updatedHeight - newMargin.top - newMargin.bottom;
+            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+        }
+    });
+
+    newWidthInput.addEventListener('change', (e) => {
+        const updatedWidth = parseInt(e.target.value);
+        if (!isNaN(updatedWidth)) {
+            newWidth = updatedWidth - newMargin.left - newMargin.right;
+            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+        }
+    });
+
+    newMarginInput.addEventListener('change', (e) => {
+        const updatedMargin = parseInt(e.target.value);
+        if (!isNaN(updatedMargin)) {
+            newMargin = { top: updatedMargin, right: updatedMargin, bottom: updatedMargin, left: updatedMargin };
+            newWidth = parseInt(newWidthInput.value || 1000) - newMargin.left - newMargin.right;
+            newHeight = parseInt(newHeightInput.value || 600) - newMargin.top - newMargin.bottom;
+            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+        }
+    });
+
+    // Adicionar dados ao novo gráfico via input
+    newAddDataButton.addEventListener('click', () => {
+        const newCat = newCategoryInput.value.trim();
+        const newVal = parseFloat(newValueInput.value);
+
+        if (newCat && !isNaN(newVal)) {
+            // Verificar se a categoria já existe, se existir, atualizar o valor
+            const existingNewData = newChartData.find(d => d.category === newCat);
+            if (existingNewData) {
+                existingNewData.value = newVal;
+            } else {
+                newChartData.push({ category: newCat, value: newVal });
+            }
+            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+
+            // Limpar os inputs
+            newCategoryInput.value = '';
+            newValueInput.value = '';
+        } else {
+            alert("Por favor, insira uma categoria válida e um valor numérico.");
+        }
+    });
+});
