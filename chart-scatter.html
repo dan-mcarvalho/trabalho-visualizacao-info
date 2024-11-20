@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualização de Dados</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-content">
+          <h1>Visualização de Dados</h1>
+          <h3>Gráfico de dispersão</h3>
+        </div>
+      </header>
+      <main>
+        <div class="main-content">
+          <div class="chart-options">
+            <a class="chart-option" href="index.html">Gráfico de barras</a>
+            <a class="chart-option--selected" href="chart-scatter.html"
+              >Gráfico de dispersão</a
+            >
+            <a class="chart-option" href="chart-heatmap.html"
+              >Gráfico de matriz de calor</a
+            >
+          </div>
+          <div id="chart-scatter"></div>
+        </div>
+      </main>
+      <!-- <footer>
+        <div class="footer-content">footer auqi</div>
+      </footer> -->
+    </div>
+  </body>
+</html>
+<script src="scatter.js"></script>
+<style>
+  .chart {
+    font: 10px sans-serif;
+    shape-rendering: crispEdges;
+  }
+
+  .bar {
+    fill: steelblue;
+  }
+
+  .bar:hover {
+    fill: orange;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+  }
+
+  .chart-option {
+    color: rgb(43, 122, 226);
+    font-weight: bold;
+    text-decoration: underline;
+    font-size: 20px;
+  }
+
+  .chart-option--selected {
+    text-decoration: none;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgb(43, 122, 226);
+  }
+
+  #chart-bar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    height: 80vh;
+  }
+
+  .header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 8rem;
+  }
+
+  .footer-content {
+  }
+
+  .chart-options {
+    width: 100%;
+    gap: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
