@@ -1,9 +1,59 @@
-// D3.js is loaded via script tag in HTML
-// No import needed since d3 is available globally
+const heightInput = document.getElementById('height-input');
+const widthInput = document.getElementById('width-input'); 
+const marginInput = document.getElementById('margin-input');
 
-const margin = {top: 20, right: 30, bottom: 30, left: 40};
-const width = 1000 - margin.left - margin.right;
-const height = 600 - margin.top - margin.bottom;
+let margin = {top: 20, right: 30, bottom: 30, left: 40};
+let width = 1000 - margin.left - margin.right;
+let height = 600 - margin.top - margin.bottom;
+
+heightInput.addEventListener('change', (e) => {
+  if (!e.target.value) {
+    height = 600 - margin.top - margin.bottom;
+    d3.select("#chart-bar svg").remove();
+    createBarChart("#chart-bar", barData);
+  } else {
+    const newHeight = parseInt(e.target.value);
+    if (!isNaN(newHeight)) {
+      height = newHeight - margin.top - margin.bottom;
+      d3.select("#chart-bar svg").remove();
+      createBarChart("#chart-bar", barData);
+    }
+  }
+});
+
+widthInput.addEventListener('change', (e) => {
+  if (!e.target.value) {
+    width = 1000 - margin.left - margin.right;
+    d3.select("#chart-bar svg").remove();
+    createBarChart("#chart-bar", barData);
+  } else {
+    const newWidth = parseInt(e.target.value);
+    if (!isNaN(newWidth)) {
+      width = newWidth - margin.left - margin.right;
+      d3.select("#chart-bar svg").remove();
+      createBarChart("#chart-bar", barData);
+    }
+  }
+});
+
+marginInput.addEventListener('change', (e) => {
+  if (!e.target.value) {
+    margin = {top: 20, right: 30, bottom: 30, left: 40};
+    width = 1000 - margin.left - margin.right;
+    height = 600 - margin.top - margin.bottom;
+    d3.select("#chart-bar svg").remove();
+    createBarChart("#chart-bar", barData);
+  } else {
+    const newMargin = parseInt(e.target.value);
+    if (!isNaN(newMargin)) {
+      margin = {top: newMargin, right: newMargin, bottom: newMargin, left: newMargin};
+      width = parseInt(widthInput.value || 1000) - margin.left - margin.right;
+      height = parseInt(heightInput.value || 600) - margin.top - margin.bottom;
+      d3.select("#chart-bar svg").remove();
+      createBarChart("#chart-bar", barData);
+    }
+  }
+});
 
 function createBarChart(selector, data) {
     const svg = d3.select(selector)
