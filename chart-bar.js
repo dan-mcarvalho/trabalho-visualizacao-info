@@ -6,6 +6,8 @@ const valueInput = document.getElementById('value-input');
 const addDataButton = document.getElementById('add-data-button');
 const createNewChartButton = document.getElementById('create-new-chart-button');
 const additionalChartsContainer = document.getElementById('additional-charts-container');
+const labelXInput = document.getElementById('label-x-input');
+const labelYInput = document.getElementById('label-y-input');
 
 let margin = { top: 20, right: 30, bottom: 30, left: 40 };
 let width = 1000 - margin.left - margin.right;
@@ -20,14 +22,11 @@ let barData = [
     { category: "F", value: 90 }
 ];
 
-// Função para criar o gráfico de barras
 function createBarChart(selector, data, config = {}) {
-    const { width = 1000, height = 600, margin = { top: 20, right: 30, bottom: 50, left: 50 } } = config;
+    const { width = 1000, height = 600, margin = { top: 20, right: 30, bottom: 50, left: 50 }, labelX , labelY } = config;
 
-    // Remover gráfico anterior, se houver
     d3.select(selector).select("svg").remove();
 
-    // Criar SVG e o grupo principal
     const svg = d3.select(selector)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -35,7 +34,6 @@ function createBarChart(selector, data, config = {}) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Definir as escalas
     const x = d3.scaleBand()
         .domain(data.map(d => d.category))
         .range([0, width])
@@ -46,7 +44,7 @@ function createBarChart(selector, data, config = {}) {
         .nice()
         .range([height, 0]);
 
-    // Criar as barras
+
     svg.append("g")
         .selectAll(".bar")
         .data(data)
@@ -64,41 +62,51 @@ function createBarChart(selector, data, config = {}) {
             d3.select(this).attr("fill", "steelblue");
         });
 
-    // Eixo Y
     svg.append("g")
         .call(d3.axisLeft(y));
+            
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+    svg.append("text")
+        .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
+        .style("text-anchor", "middle")
+        .text(labelXInput?.value);
+
+    svg.append("g")
+            .call(d3.axisLeft(y));
     
-    // Texto do Eixo Y
+
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Valor");
-
-    // Eixo X
-    svg.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x));
-    
-    // Texto do Eixo X
-    svg.append("text")
-        .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
-        .style("text-anchor", "middle")
-        .text("Categoria");
+        .text(labelYInput?.value);
 }
 
-// Inicializar gráfico com as configurações iniciais
+
+
 createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
 
-// Eventos para atualizar as dimensões do gráfico dinamicamente
 heightInput.addEventListener('change', (e) => {
     const newHeight = parseInt(e.target.value);
     if (!isNaN(newHeight)) {
         height = newHeight - margin.top - margin.bottom;
         createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
     }
+});
+
+labelXInput.addEventListener('change', (e) => {
+    const newLabelX = e.target.value;
+    createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin, labelX: newLabelX });
+});
+
+labelYInput.addEventListener('change', (e) => {
+    const newLabelY = e.target.value;
+    createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin, labelY: newLabelY });
 });
 
 widthInput.addEventListener('change', (e) => {
@@ -162,15 +170,23 @@ createNewChartButton.addEventListener('click', () => {
               <label>Margem:</label>
               <input type="text" class="margin-input" value="20" placeholder="20" />
             </div>
+             <div class="chart-config-inputs-holder__input">
+              <label for="label-x-input">Label X:</label>
+              <input type="text" class="label-x-input" value="Categoria" placeholder="20" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label for="label-y-input">Label Y:</label>
+              <input type="text" class="label-y-input" value="Valor" placeholder="20" />
+            </div>
         </div>
         <div class="chart-data-inputs-holder">
             <span class="chart-config-inputs-holder__title">Adicionar Dados ao Gráfico |</span>
             <div class="chart-config-inputs-holder__input">
-              <label>Categoria:</label>
+              <label>X:</label>
               <input type="text" class="category-input" placeholder="Categoria" />
             </div>
             <div class="chart-config-inputs-holder__input">
-              <label>Valor:</label>
+              <label>Y:</label>
               <input type="number" class="value-input" placeholder="Valor" />
             </div>
             <button type="button" class="add-data-button">Adicionar ao Gráfico</button>
@@ -180,11 +196,7 @@ createNewChartButton.addEventListener('click', () => {
     additionalChartsContainer.appendChild(newChartContainer);
 
     // Dados iniciais para o novo gráfico
-    const newChartData = [
-        { category: "X", value: 40 },
-        { category: "Y", value: 70 },
-        { category: "Z", value: 50 }
-    ];
+    const newChartData = [];
 
     // Selecionar elementos do novo gráfico
     const chartHolder = newChartContainer.querySelector('.chart-holder');
@@ -194,6 +206,8 @@ createNewChartButton.addEventListener('click', () => {
     const newCategoryInput = newChartContainer.querySelector('.category-input');
     const newValueInput = newChartContainer.querySelector('.value-input');
     const newAddDataButton = newChartContainer.querySelector('.add-data-button');
+    const newLabelXInput = newChartContainer.querySelector('.label-x-input');
+    const newLabelYInput = newChartContainer.querySelector('.label-y-input');
 
     let newMargin = { top: 20, right: 30, bottom: 30, left: 40 };
     let newWidth = 1000 - newMargin.left - newMargin.right;
