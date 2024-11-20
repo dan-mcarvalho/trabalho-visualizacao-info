@@ -85,12 +85,25 @@ function createBarChart(selector, data) {
 
     svg.append("g")
         .call(d3.axisLeft(y));
+    
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Valor");
 
     svg.append("g")
+        .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
+    
+    svg.append("text")
+        .attr("transform", `translate(${width/2}, ${height + margin.bottom - 10})`)
+        .style("text-anchor", "middle")
+        .text("Categoria");
 }
 
-// Dados para gráfico de barras
 const barData = [
     {category: "A", value: 30},
     {category: "B", value: 80},
@@ -100,5 +113,4 @@ const barData = [
     {category: "F", value: 90}
 ];
 
-// Criar gráfico de barras
 createBarChart("#chart-bar", barData);
