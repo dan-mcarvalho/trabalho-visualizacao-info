@@ -25,6 +25,23 @@
               >Gráfico de matriz de calor</a
             >
           </div>
+          <div class="chart-config-inputs-holder">
+            <span class="chart-config-inputs-holder__title"
+              >Configurações do gráfico |</span
+            >
+            <div class="chart-config-inputs-holder__input">
+              <label for="height-input">Altura:</label>
+              <input type="text" id="height-input" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label for="width-input">Largura:</label>
+              <input type="text" id="width-input" />
+            </div>
+            <div class="chart-config-inputs-holder__input">
+              <label for="margin-input">Margem:</label>
+              <input type="text" id="margin-input" />
+            </div>
+          </div>
           <div id="chart-scatter"></div>
         </div>
       </main>
@@ -91,7 +108,7 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
-    gap: 8rem;
+    gap: 3rem;
   }
 
   .footer-content {
@@ -104,4 +121,22 @@
     align-items: center;
     justify-content: center;
   }
+
+  .chart-config-inputs-holder__title {
+    font-weight: bold;
+  }
+
+  .chart-config-inputs-holder {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  input {
+    border: 1px solid #000;
+    border-radius: 4px;
+    padding: 4px;
+    width: 100px;
+  }
+
 </style>
