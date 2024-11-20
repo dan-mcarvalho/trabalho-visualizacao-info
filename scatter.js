@@ -1,60 +1,144 @@
 const heightInput = document.getElementById('height-input');
 const widthInput = document.getElementById('width-input'); 
 const marginInput = document.getElementById('margin-input');
+const xInput = document.getElementById('x-input');
+const yInput = document.getElementById('y-input');
+const addDataButton = document.getElementById('add-data-button');
+const createNewChartButton = document.getElementById('create-new-chart-button');
+const additionalChartsContainer = document.getElementById('additional-charts-container');
 
 let margin = {top: 20, right: 30, bottom: 30, left: 40};
 let width = 1000 - margin.left - margin.right;
 let height = 600 - margin.top - margin.bottom;
 
+// Atualiza as dimensões do gráfico ao modificar os inputs
 heightInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    height = 600 - margin.top - margin.bottom;
-    d3.select("#chart-scatter svg").remove();
-    createScatterPlot("#chart-scatter", scatterData);
-  } else {
     const newHeight = parseInt(e.target.value);
     if (!isNaN(newHeight)) {
-      height = newHeight - margin.top - margin.bottom;
-      d3.select("#chart-scatter svg").remove();
-      createScatterPlot("#chart-scatter", scatterData);
+        height = newHeight - margin.top - margin.bottom;
+        d3.select("#chart-scatter svg").remove();
+        createScatterPlot("#chart-scatter", scatterData);
     }
-  }
 });
 
 widthInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    width = 1000 - margin.left - margin.right;
-    d3.select("#chart-scatter svg").remove();
-    createScatterPlot("#chart-scatter", scatterData);
-  } else {
     const newWidth = parseInt(e.target.value);
     if (!isNaN(newWidth)) {
-      width = newWidth - margin.left - margin.right;
-      d3.select("#chart-scatter svg").remove();
-      createScatterPlot("#chart-scatter", scatterData);
+        width = newWidth - margin.left - margin.right;
+        d3.select("#chart-scatter svg").remove();
+        createScatterPlot("#chart-scatter", scatterData);
     }
-  }
 });
 
 marginInput.addEventListener('change', (e) => {
-  if (!e.target.value) {
-    margin = {top: 20, right: 30, bottom: 30, left: 40};
-    width = 1000 - margin.left - margin.right;
-    height = 600 - margin.top - margin.bottom;
-    d3.select("#chart-scatter svg").remove();
-    createScatterPlot("#chart-scatter", scatterData);
-  } else {
     const newMargin = parseInt(e.target.value);
     if (!isNaN(newMargin)) {
-      margin = {top: newMargin, right: newMargin, bottom: newMargin, left: newMargin};
-      width = parseInt(widthInput.value || 1000) - margin.left - margin.right;
-      height = parseInt(heightInput.value || 600) - margin.top - margin.bottom;
-      d3.select("#chart-scatter svg").remove();
-      createScatterPlot("#chart-scatter", scatterData);
+        margin = {top: newMargin, right: newMargin, bottom: newMargin, left: newMargin};
+        width = parseInt(widthInput.value || 1000) - margin.left - margin.right;
+        height = parseInt(heightInput.value || 600) - margin.top - margin.bottom;
+        d3.select("#chart-scatter svg").remove();
+        createScatterPlot("#chart-scatter", scatterData);
     }
-  }
 });
-function createScatterPlot(selector, data) {
+
+// Função para adicionar dados ao gráfico
+addDataButton.addEventListener('click', () => {
+    const xValue = parseFloat(xInput.value);
+    const yValue = parseFloat(yInput.value);
+
+    if (!isNaN(xValue) && !isNaN(yValue)) {
+        scatterData.push({ Sales: xValue, Profit: yValue });
+        d3.select("#chart-scatter svg").remove();
+        createScatterPlot("#chart-scatter", scatterData);
+
+        xInput.value = '';
+        yInput.value = '';
+    } else {
+        alert('Por favor, insira valores válidos para X e Y.');
+    }
+});
+
+// Função para criar novos gráficos
+createNewChartButton.addEventListener('click', () => {
+    const newChartContainer = document.createElement('div');
+    newChartContainer.className = 'chart-container';
+    newChartContainer.innerHTML = `
+        <div class="chart-config-inputs-holder">
+            <label>Altura:</label><input type="text" class="height-input" value="600" />
+            <label>Largura:</label><input type="text" class="width-input" value="1000" />
+            <label>Margem:</label><input type="text" class="margin-input" value="20" />
+        </div>
+        <div class="chart-data-inputs-holder">
+            <label>X:</label><input type="number" class="x-input" placeholder="Eixo X" />
+            <label>Y:</label><input type="number" class="y-input" placeholder="Eixo Y" />
+            <button class="add-data-button">Adicionar ao Gráfico</button>
+        </div>
+        <div class="chart-holder"></div>
+    `;
+    additionalChartsContainer.appendChild(newChartContainer);
+
+    const newScatterData = [{ Sales: 100, Profit: 50 }];
+    const chartHolder = newChartContainer.querySelector('.chart-holder');
+    const newHeightInput = newChartContainer.querySelector('.height-input');
+    const newWidthInput = newChartContainer.querySelector('.width-input');
+    const newMarginInput = newChartContainer.querySelector('.margin-input');
+    const newXInput = newChartContainer.querySelector('.x-input');
+    const newYInput = newChartContainer.querySelector('.y-input');
+    const newAddDataButton = newChartContainer.querySelector('.add-data-button');
+
+    let newMargin = {top: 20, right: 30, bottom: 30, left: 40};
+    let newWidth = 1000 - newMargin.left - newMargin.right;
+    let newHeight = 600 - newMargin.top - newMargin.bottom;
+
+    createScatterPlot(chartHolder, newScatterData);
+
+    newHeightInput.addEventListener('change', (e) => {
+        const updatedHeight = parseInt(e.target.value);
+        if (!isNaN(updatedHeight)) {
+            newHeight = updatedHeight - newMargin.top - newMargin.bottom;
+            d3.select(chartHolder).select("svg").remove();
+            createScatterPlot(chartHolder, newScatterData, { width: newWidth, height: newHeight, margin: newMargin });
+        }
+    });
+
+    newWidthInput.addEventListener('change', (e) => {
+        const updatedWidth = parseInt(e.target.value);
+        if (!isNaN(updatedWidth)) {
+            newWidth = updatedWidth - newMargin.left - newMargin.right;
+            d3.select(chartHolder).select("svg").remove();
+            createScatterPlot(chartHolder, newScatterData, { width: newWidth, height: newHeight, margin: newMargin });
+        }
+    });
+
+    newMarginInput.addEventListener('change', (e) => {
+        const updatedMargin = parseInt(e.target.value);
+        if (!isNaN(updatedMargin)) {
+            newMargin = {top: updatedMargin, right: updatedMargin, bottom: updatedMargin, left: updatedMargin};
+            d3.select(chartHolder).select("svg").remove();
+            createScatterPlot(chartHolder, newScatterData, { width: newWidth, height: newHeight, margin: newMargin });
+        }
+    });
+
+    newAddDataButton.addEventListener('click', () => {
+        const xValue = parseFloat(newXInput.value);
+        const yValue = parseFloat(newYInput.value);
+
+        if (!isNaN(xValue) && !isNaN(yValue)) {
+            newScatterData.push({ Sales: xValue, Profit: yValue });
+            d3.select(chartHolder).select("svg").remove();
+            createScatterPlot(chartHolder, newScatterData);
+            newXInput.value = '';
+            newYInput.value = '';
+        } else {
+            alert('Por favor, insira valores válidos para X e Y.');
+        }
+    });
+});
+
+// Função para criar o gráfico de dispersão
+function createScatterPlot(selector, data, config = { width: width, height: height, margin: margin }) {
+    const { width, height, margin } = config;
+
     const svg = d3.select(selector)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -81,34 +165,32 @@ function createScatterPlot(selector, data) {
         .attr("r", 4)
         .attr("fill", "steelblue")
         .attr("opacity", 0.7)
-        .on("mouseover", function (event, d) {
+        .on("mouseover", function () {
             d3.select(this).attr("fill", "orange").attr("r", 6);
         })
-        .on("mouseout", function (event, d) {
+        .on("mouseout", function () {
             d3.select(this).attr("fill", "steelblue").attr("r", 4);
         });
-    // Add X axis and label
+
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
-    
+
     svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 5)
         .style("text-anchor", "middle")
-        .text("Sales")
-        .attr("clip-path", "none");
+        .text("Sales");
 
     svg.append("g")
         .call(d3.axisLeft(y));
-        
+
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -(height / 2))
         .attr("y", -margin.left + 11)
         .style("text-anchor", "middle")
-        .text("Profit")
-        .attr("clip-path", "none"); // Prevent clipping
+        .text("Profit");
 }
 
 // Dados para gráfico de dispersão
