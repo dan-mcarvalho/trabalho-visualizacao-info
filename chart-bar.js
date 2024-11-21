@@ -72,7 +72,7 @@ function createBarChart(selector, data, config = {}) {
     svg.append("text")
         .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
         .style("text-anchor", "middle")
-        .text(labelXInput?.value);
+        .text(labelX || "");
 
     svg.append("g")
             .call(d3.axisLeft(y));
@@ -84,12 +84,19 @@ function createBarChart(selector, data, config = {}) {
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text(labelYInput?.value);
+        .text(labelY || "");
 }
 
 
 
-createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
+createBarChart("#chart-bar", barData, {
+    width: width + margin.left + margin.right,
+    height: height + margin.top + margin.bottom,
+    margin,
+    labelX: labelXInput.value || "Categoria", // Passa o valor inicial do input global ou um padrão
+    labelY: labelYInput.value || "Valor" // Passa o valor inicial do input global ou um padrão
+});
+
 
 heightInput.addEventListener('change', (e) => {
     const newHeight = parseInt(e.target.value);
@@ -99,14 +106,23 @@ heightInput.addEventListener('change', (e) => {
     }
 });
 
-labelXInput.addEventListener('change', (e) => {
-    const newLabelX = e.target.value;
-    createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin, labelX: newLabelX });
+labelXInput.addEventListener('change', () => {
+    createBarChart("#chart-bar", barData, { 
+        width: width + margin.left + margin.right, 
+        height: height + margin.top + margin.bottom, 
+        margin, 
+        labelX: labelXInput.value || "Categoria", 
+        labelY: labelYInput.value || "Valor" 
+    });
 });
-
-labelYInput.addEventListener('change', (e) => {
-    const newLabelY = e.target.value;
-    createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin, labelY: newLabelY });
+labelYInput.addEventListener('change', () => {
+    createBarChart("#chart-bar", barData, { 
+        width: width + margin.left + margin.right, 
+        height: height + margin.top + margin.bottom, 
+        margin, 
+        labelX: labelXInput.value || "Categoria", 
+        labelY: labelYInput.value || "Valor" 
+    });
 });
 
 widthInput.addEventListener('change', (e) => {
@@ -134,12 +150,12 @@ addDataButton.addEventListener('click', () => {
 
     if (newCategory && !isNaN(newValue)) {
         // Verificar se a categoria já existe, se existir, atualizar o valor
-        const existingData = barData.find(d => d.category === newCategory);
+        const existingData = newChartData.find(d => d.category === newCat);
         if (existingData) {
-            existingData.value = newValue;
+            existingData.value = newVal;
         } else {
-            barData.push({ category: newCategory, value: newValue });
-        }
+            newChartData.push({ category: newCat, value: newVal });
+        }        
         createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
 
         // Limpar os inputs
@@ -170,7 +186,7 @@ createNewChartButton.addEventListener('click', () => {
               <label>Margem:</label>
               <input type="text" class="margin-input" value="20" placeholder="20" />
             </div>
-             <div class="chart-config-inputs-holder__input">
+            <div class="chart-config-inputs-holder__input">
               <label for="label-x-input">Label X:</label>
               <input type="text" class="label-x-input" value="Categoria" placeholder="20" />
             </div>
@@ -214,14 +230,26 @@ createNewChartButton.addEventListener('click', () => {
     let newHeight = 600 - newMargin.top - newMargin.bottom;
 
     // Criar o novo gráfico
-    createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+    createBarChart(chartHolder, newChartData, {
+        width: newWidth + newMargin.left + newMargin.right,
+        height: newHeight + newMargin.top + newMargin.bottom,
+        margin: newMargin,
+        labelX: newLabelXInput.value,
+        labelY: newLabelYInput.value
+    });
 
     // Eventos para atualizar as dimensões do novo gráfico dinamicamente
     newHeightInput.addEventListener('change', (e) => {
         const updatedHeight = parseInt(e.target.value);
         if (!isNaN(updatedHeight)) {
             newHeight = updatedHeight - newMargin.top - newMargin.bottom;
-            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+            createBarChart(chartHolder, newChartData, {
+                width: newWidth + newMargin.left + newMargin.right,
+                height: newHeight + newMargin.top + newMargin.bottom,
+                margin: newMargin,
+                labelX: newLabelXInput.value,
+                labelY: newLabelYInput.value
+            });
         }
     });
 
@@ -229,7 +257,13 @@ createNewChartButton.addEventListener('click', () => {
         const updatedWidth = parseInt(e.target.value);
         if (!isNaN(updatedWidth)) {
             newWidth = updatedWidth - newMargin.left - newMargin.right;
-            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+            createBarChart(chartHolder, newChartData, {
+                width: newWidth + newMargin.left + newMargin.right,
+                height: newHeight + newMargin.top + newMargin.bottom,
+                margin: newMargin,
+                labelX: newLabelXInput.value,
+                labelY: newLabelYInput.value
+            });
         }
     });
 
@@ -239,7 +273,13 @@ createNewChartButton.addEventListener('click', () => {
             newMargin = { top: updatedMargin, right: updatedMargin, bottom: updatedMargin, left: updatedMargin };
             newWidth = parseInt(newWidthInput.value || 1000) - newMargin.left - newMargin.right;
             newHeight = parseInt(newHeightInput.value || 600) - newMargin.top - newMargin.bottom;
-            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+            createBarChart(chartHolder, newChartData, {
+                width: newWidth + newMargin.left + newMargin.right,
+                height: newHeight + newMargin.top + newMargin.bottom,
+                margin: newMargin,
+                labelX: newLabelXInput.value,
+                labelY: newLabelYInput.value
+            });
         }
     });
 
@@ -249,20 +289,47 @@ createNewChartButton.addEventListener('click', () => {
         const newVal = parseFloat(newValueInput.value);
 
         if (newCat && !isNaN(newVal)) {
-            // Verificar se a categoria já existe, se existir, atualizar o valor
             const existingNewData = newChartData.find(d => d.category === newCat);
             if (existingNewData) {
                 existingNewData.value = newVal;
             } else {
                 newChartData.push({ category: newCat, value: newVal });
             }
-            createBarChart(chartHolder, newChartData, { width: newWidth + newMargin.left + newMargin.right, height: newHeight + newMargin.top + newMargin.bottom, margin: newMargin });
+            createBarChart(chartHolder, newChartData, {
+                width: newWidth + newMargin.left + newMargin.right,
+                height: newHeight + newMargin.top + newMargin.bottom,
+                margin: newMargin,
+                labelX: newLabelXInput.value,
+                labelY: newLabelYInput.value
+            });
 
-            // Limpar os inputs
             newCategoryInput.value = '';
             newValueInput.value = '';
         } else {
             alert("Por favor, insira uma categoria válida e um valor numérico.");
         }
+    });
+
+    // Eventos para atualizar os rótulos X e Y
+    newLabelXInput.addEventListener('change', (e) => {
+        const updatedLabelX = e.target.value;
+        createBarChart(chartHolder, newChartData, {
+            width: newWidth + newMargin.left + newMargin.right,
+            height: newHeight + newMargin.top + newMargin.bottom,
+            margin: newMargin,
+            labelX: updatedLabelX,
+            labelY: newLabelYInput.value
+        });
+    });
+
+    newLabelYInput.addEventListener('change', (e) => {
+        const updatedLabelY = e.target.value;
+        createBarChart(chartHolder, newChartData, {
+            width: newWidth + newMargin.left + newMargin.right,
+            height: newHeight + newMargin.top + newMargin.bottom,
+            margin: newMargin,
+            labelX: newLabelXInput.value,
+            labelY: updatedLabelY
+        });
     });
 });
