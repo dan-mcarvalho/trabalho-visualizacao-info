@@ -11,15 +11,14 @@
       <header>
         <div class="header-content">
           <h1>Visualização de Dados</h1>
-          <h3>Gráfico de barras</h3>
         </div>
       </header>
       <main>
         <div class="main-content">
           <div class="chart-options">
-            <a class="chart-option--selected" href="index.html">Gráfico de barras</a>
-            <a class="chart-option" href="chart-scatter.html">Gráfico de dispersão</a>
-            <a class="chart-option" href="chart-heatmap.html">Gráfico de matriz de calor</a>
+            <a name="bar" class="chart-option" href="#" onclick="updateChart('bar')">Gráfico de barras</a>
+            <a name="scatter" class="chart-option" href="#" onclick="updateChart('scatter')">Gráfico de dispersão</a>
+            <a name="heatmap" class="chart-option" href="#" onclick="updateChart('heatmap')">Gráfico de matriz de calor</a>
           </div>
           <div class="chart-config-inputs-holder">
             <span class="chart-config-inputs-holder__title">Configurações do gráfico |</span>
@@ -48,19 +47,19 @@
           <div class="chart-data-inputs-holder">
             <span class="chart-config-inputs-holder__title">Adicionar Dados ao Gráfico |</span>
             <div class="chart-config-inputs-holder__input">
-              <label for="category-input">X:</label>
-              <input type="text" id="category-input" placeholder="Categoria" />
+              <label for="x-input">X:</label>
+              <input type="text" id="x-input" placeholder="Categoria" />
             </div>
             <div class="chart-config-inputs-holder__input">
-              <label for="value-input">Y:</label>
-              <input type="number" id="value-input" placeholder="Valor" />
+              <label for="y-input">Y:</label>
+              <input type="number" id="y-input" placeholder="Valor" />
             </div>
             <button type="button" id="add-data-button">Adicionar ao Gráfico</button>
           </div>
 
-          <div class="chart-bar-container" id="chart-bar"></div>
+          <div class="chart-container" id="chart"></div>
 
-          <div class="chart-bar-container" id="additional-charts-container"></div>
+          <div class="chart-container" id="additional-charts-container"></div>
 
           <div class="create-chart-button-holder">
             <button id="create-new-chart-button">Criar Novo Gráfico de Barras</button>
@@ -69,7 +68,12 @@
       </main>
     </div>
   </body>
-  <script src="chart-bar.js"></script>
+  <script src="scripts/ChartConfig.js"></script>
+  <script src="scripts/datasets.js"></script>
+  <script src="scripts/ChartBar.js"></script>
+  <script src="scripts/Scatter.js"></script>
+  <script src="scripts/Heatmap.js"></script>
+  <script src="scripts/index.js"></script>
   <style>
     .chart {
       font: 10px sans-serif;
@@ -104,9 +108,10 @@
 
     .chart-option--selected {
       text-decoration: none;
+      color: #fff;
       box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
       border-radius: 10px;
-      padding: 10px;
+      padding: 8px;
       background-color: rgb(43, 122, 225);
     }
 
@@ -138,7 +143,7 @@
       
 
     }
-    #chart-bar {
+    #chart {
       width: 100%;
       height: 100%;
       display: flex;
