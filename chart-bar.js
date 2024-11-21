@@ -8,7 +8,7 @@ const createNewChartButton = document.getElementById('create-new-chart-button');
 const additionalChartsContainer = document.getElementById('additional-charts-container');
 const labelXInput = document.getElementById('label-x-input');
 const labelYInput = document.getElementById('label-y-input');
-
+const csvUploadInput = document.getElementById('csv-input');
 let margin = { top: 20, right: 30, bottom: 30, left: 40 };
 let width = 1000 - margin.left - margin.right;
 let height = 600 - margin.top - margin.bottom;
@@ -142,30 +142,102 @@ marginInput.addEventListener('change', (e) => {
         createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
     }
 });
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        readCSV(file);
+    } else {
+        alert('Nenhum arquivo selecionado.');
+    }
+}
+function readCSV(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const csv = reader.result;
+        parseCSV(csv);
+    };
+    reader.onerror = function (e) {
+        console.error('Error reading file:', e);
+    };
+    reader.readAsText(file);
+}
 
+function parseCSV(csvData) {
+    Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function (result) {
+            const originalData = result.data;
+            const filteredData = originalData.filter(row => row.category && row.value);
+
+            if (filteredData.length < originalData.length) {
+                alert(`Warning: ${originalData.length - filteredData.length} rows with missing data were skipped.`);
+            }
+
+            barData = filteredData
+                .map(row => ({
+                    category: row.category,
+                    value: parseFloat(row.value)
+                }))
+                .filter(d => !isNaN(d.value));
+
+            if (barData.length < filteredData.length) {
+                alert(`Warning: ${filteredData.length - barData.length} rows with invalid value data were skipped.`);
+            }
+
+            if (barData.length > 0) {
+                createBarChart("#chart-bar", barData, {
+                    width: width + margin.left + margin.right,
+                    height: height + margin.top + margin.bottom,
+                    margin,
+                    labelX: labelXInput.value || "Categoria",
+                    labelY: labelYInput.value || "Valor"
+                });
+            } else {
+                alert('No valid data to display.');
+            }
+        },
+        error: function (error) {
+            console.error('Error parsing CSV:', error);
+            alert('Error parsing CSV file.');
+        }
+    });
+}
+
+csvUploadInput.addEventListener('change', handleFileSelect);
+csvUploadInput.addEventListener('change', function() {
+    this.value = '';
+});
 // Adicionar dados ao gráfico via input
 addDataButton.addEventListener('click', () => {
     const newCategory = categoryInput.value.trim();
     const newValue = parseFloat(valueInput.value);
 
     if (newCategory && !isNaN(newValue)) {
-        // Verificar se a categoria já existe, se existir, atualizar o valor
-        const existingData = newChartData.find(d => d.category === newCat);
+        // Check if the category already exists in barData
+        const existingData = barData.find(d => d.category === newCategory);
         if (existingData) {
-            existingData.value = newVal;
+            existingData.value = newValue;
         } else {
-            newChartData.push({ category: newCat, value: newVal });
-        }        
-        createBarChart("#chart-bar", barData, { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom, margin });
-
-        // Limpar os inputs
+            barData.push({ category: newCategory, value: newValue });
+        }
+        // Re-render the chart with the updated data
+        createBarChart("#chart-bar", barData, {
+            width: width + margin.left + margin.right,
+            height: height + margin.top + margin.bottom,
+            margin,
+            labelX: labelXInput.value || "Categoria",
+            labelY: labelYInput.value || "Valor"
+        });
+        // Clear the input fields
         categoryInput.value = '';
         valueInput.value = '';
     } else {
-        alert("Por favor, insira uma categoria válida e um valor numérico.");
+        alert("Please enter a valid category and numeric value.");
     }
 });
 
+// Função para criar novos gráficos de maneira independente
 // Função para criar novos gráficos de maneira independente
 createNewChartButton.addEventListener('click', () => {
     // Criar um novo contêiner para o novo gráfico e seus inputs
@@ -207,6 +279,12 @@ createNewChartButton.addEventListener('click', () => {
             </div>
             <button type="button" class="add-data-button">Adicionar ao Gráfico</button>
         </div>
+        <div class="csv-input-holder">
+            <div class="csv-input-holder__input">
+                <label>Carregar CSV:</label>
+                <input type="file" class="csv-input" accept=".csv" />
+            </div>
+        </div>
         <div class="chart-holder"></div>
     `;
     additionalChartsContainer.appendChild(newChartContainer);
@@ -224,6 +302,7 @@ createNewChartButton.addEventListener('click', () => {
     const newAddDataButton = newChartContainer.querySelector('.add-data-button');
     const newLabelXInput = newChartContainer.querySelector('.label-x-input');
     const newLabelYInput = newChartContainer.querySelector('.label-y-input');
+    const newCsvUploadInput = newChartContainer.querySelector('.csv-input')
 
     let newMargin = { top: 20, right: 30, bottom: 30, left: 40 };
     let newWidth = 1000 - newMargin.left - newMargin.right;
@@ -237,6 +316,50 @@ createNewChartButton.addEventListener('click', () => {
         labelX: newLabelXInput.value,
         labelY: newLabelYInput.value
     });
+// Manipulador para carregar CSV no novo gráfico
+    // Adicionar manipulação para carregar CSV
+    newCsvUploadInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const csvContent = e.target.result;
+
+                Papa.parse(csvContent, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (result) {
+                        const parsedData = result.data.map(row => ({
+                            category: row.category,
+                            value: parseFloat(row.value),
+                        })).filter(d => d.category && !isNaN(d.value));
+
+                        if (parsedData.length > 0) {
+                            newChartData.length = 0; // Clear existing data
+                            newChartData.push(...parsedData); // Add new data
+                            createBarChart(chartHolder, newChartData, {
+                                width: newWidth + newMargin.left + newMargin.right,
+                                height: newHeight + newMargin.top + newMargin.bottom,
+                                margin: newMargin,
+                                labelX: newLabelXInput.value || "Categoria",
+                                labelY: newLabelYInput.value || "Valor"
+                            });
+                        } else {
+                            alert("No valid data found in CSV.");
+                        }
+                    },
+                    error: function (error) {
+                        alert("Error parsing CSV.");
+                        console.error(error);
+                    }
+                });
+            };
+            reader.readAsText(file);
+        } else {
+            alert("No file selected.");
+        }
+    });
+
 
     // Eventos para atualizar as dimensões do novo gráfico dinamicamente
     newHeightInput.addEventListener('change', (e) => {

@@ -1,75 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualização de Dados</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <header>
-        <div class="header-content">
-          <h1>Visualização de Dados</h1>
-          <h3>Gráfico de barras</h3>
-        </div>
-      </header>
-      <main>
-        <div class="main-content">
-          <div class="chart-options">
-            <a class="chart-option--selected" href="index.html">Gráfico de barras</a>
-            <a class="chart-option" href="chart-scatter.html">Gráfico de dispersão</a>
-            <a class="chart-option" href="chart-heatmap.html">Gráfico de matriz de calor</a>
-          </div>
-          <div class="chart-config-inputs-holder">
-            <span class="chart-config-inputs-holder__title">Configurações do gráfico |</span>
-            <div class="chart-config-inputs-holder__input">
-              <label for="height-input">Altura:</label>
-              <input type="text" id="height-input" value="600" placeholder="600" />
+        <header>
+            <div class="header-content">
+                <h1>Visualização de Dados</h1>
+                <h3>Gráfico de barras</h3>
             </div>
-            <div class="chart-config-inputs-holder__input">
-              <label for="width-input">Largura:</label>
-              <input type="text" id="width-input" value="1000" placeholder="1000" />
+        </header>
+        <main>
+            <div class="main-content">
+                <div class="chart-options">
+                    <a class="chart-option--selected" href="index.html">Gráfico de barras</a>
+                    <a class="chart-option" href="chart-scatter.html">Gráfico de dispersão</a>
+                    <a class="chart-option" href="chart-heatmap.html">Gráfico de matriz de calor</a>
+                </div>
+                <div class="chart-config-inputs-holder">
+                    <span class="chart-config-inputs-holder__title">Configurações do gráfico |</span>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="height-input">Altura:</label>
+                        <input type="text" id="height-input" value="600" placeholder="600" />
+                    </div>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="width-input">Largura:</label>
+                        <input type="text" id="width-input" value="1000" placeholder="1000" />
+                    </div>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="margin-input">Margem:</label>
+                        <input type="text" id="margin-input" value="20" placeholder="20" />
+                    </div>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="label-x-input">Label X:</label>
+                        <input type="text" id="label-x-input" value="Categoria" placeholder="20" />
+                    </div>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="label-y-input">Label Y:</label>
+                        <input type="text" id="label-y-input" value="Valor" placeholder="20" />
+                    </div>
+                </div>
+                <div class="chart-data-inputs-holder">
+                    <span class="chart-config-inputs-holder__title">Adicionar Dados ao Gráfico |</span>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="category-input">X:</label>
+                        <input type="text" id="category-input" placeholder="Categoria" />
+                    </div>
+                    <div class="chart-config-inputs-holder__input">
+                        <label for="value-input">Y:</label>
+                        <input type="number" id="value-input" placeholder="Valor" />
+                    </div>
+                    <button type="button" id="add-data-button">Adicionar ao Gráfico</button>
+                </div>
+                <div class="csv-input-holder">
+                  <div class="csv-input-holder__input">
+                      <label for="csv-input">Carregar outro CSV:</label>
+                      <input type="file" id="csv-input" accept=".csv" />
+                  </div>
+              </div>
+                <div class="chart-bar-container" id="chart-bar"></div>
+                <div class="chart-bar-container" id="additional-charts-container"></div>
+                <div class="create-chart-button-holder">
+                    <button id="create-new-chart-button">Criar Novo Gráfico de Barras</button>
+                </div>
             </div>
-            <div class="chart-config-inputs-holder__input">
-              <label for="margin-input">Margem:</label>
-              <input type="text" id="margin-input" value="20" placeholder="20" />
-            </div>
-            <div class="chart-config-inputs-holder__input">
-              <label for="label-x-input">Label X:</label>
-              <input type="text" id="label-x-input" value="Categoria" placeholder="20" />
-            </div>
-            <div class="chart-config-inputs-holder__input">
-              <label for="label-y-input">Label Y:</label>
-              <input type="text" id="label-y-input" value="Valor" placeholder="20" />
-            </div>
-          </div>
-
-          <div class="chart-data-inputs-holder">
-            <span class="chart-config-inputs-holder__title">Adicionar Dados ao Gráfico |</span>
-            <div class="chart-config-inputs-holder__input">
-              <label for="category-input">X:</label>
-              <input type="text" id="category-input" placeholder="Categoria" />
-            </div>
-            <div class="chart-config-inputs-holder__input">
-              <label for="value-input">Y:</label>
-              <input type="number" id="value-input" placeholder="Valor" />
-            </div>
-            <button type="button" id="add-data-button">Adicionar ao Gráfico</button>
-          </div>
-
-          <div class="chart-bar-container" id="chart-bar"></div>
-
-          <div class="chart-bar-container" id="additional-charts-container"></div>
-
-          <div class="create-chart-button-holder">
-            <button id="create-new-chart-button">Criar Novo Gráfico de Barras</button>
-          </div>
-        </div>
-      </main>
+        </main>
     </div>
-  </body>
-  <script src="chart-bar.js"></script>
+    <script src="chart-bar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <style>
     .chart {
       font: 10px sans-serif;
@@ -200,5 +202,19 @@
     button:hover {
       background-color: rgb(35, 100, 200);
     }
+    .csv-input-holder {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.csv-input-holder__input {
+    display: flex;
+    align-items: center;
+}
+
+.csv-input-holder__input label {
+    margin-right: 8px;
+}
   </style>
 </html>
