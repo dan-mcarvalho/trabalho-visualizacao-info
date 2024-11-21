@@ -95,6 +95,17 @@ createNewChartButton.addEventListener('click', () => {
             </div>
             <button type="button" class="add-data-button">Adicionar ao Gráfico</button>
         </div>
+
+
+        <div class="csv-input-holder">
+            <div class="csv-input-holder__input">
+                <label>Carregar CSV:</label>
+                <input type="file" class="csv-input" accept=".csv" />
+            </div>
+        </div>
+
+
+
         <div class="chart-holder"></div>
     `;
     additionalChartsContainer.appendChild(newChartContainer);
@@ -110,10 +121,10 @@ createNewChartButton.addEventListener('click', () => {
     const widthInput = newChartContainer.querySelector('.width-input');
     const labelXInput = newChartContainer.querySelector('.label-x-input');
     const labelYInput = newChartContainer.querySelector('.label-y-input');
-    const categoryInput = newChartContainer.querySelector('.category-input');
-    const valueInput = newChartContainer.querySelector('.value-input');
     const addDataButton = newChartContainer.querySelector('.add-data-button');
     const marginInput = newChartContainer.querySelector('.margin-input');
+    const newCsvUploadInput = newChartContainer.querySelector('.csv-input')
+
     
     // Create chart in its specific holder
     const chartHolder = newChartContainer.querySelector('.chart-holder');
@@ -123,6 +134,52 @@ createNewChartButton.addEventListener('click', () => {
         labelX: "Categoria",
         labelY: "Valor"
     });
+
+    newCsvUploadInput.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+              const csvContent = e.target.result;
+
+              Papa.parse(csvContent, {
+                  header: true,
+                  skipEmptyLines: true,
+                  complete: function (result) {
+                      const parsedData = result.data.map(row => ({
+                          category: row.category,
+                          value: parseFloat(row.value),
+                      })).filter(d => d.category && !isNaN(d.value));
+
+                      if (parsedData.length > 0) {
+                          newActiveChart.data = parsedData;
+                          newActiveChart.create(chartHolder, parsedData, {
+                              width: parseInt(widthInput.value) || 1000,
+                              height: parseInt(heightInput.value) || 600,
+                              margin: {
+                                  top: parseInt(marginInput.value) || 20,
+                                  right: parseInt(marginInput.value) || 20,
+                                  bottom: parseInt(marginInput.value) || 20,
+                                  left: parseInt(marginInput.value) || 20
+                              },
+                              labelX: labelXInput.value || "Categoria",
+                              labelY: labelYInput.value || "Valor"
+                          });
+                      } else {
+                          alert("No valid data found in CSV.");
+                      }
+                  },
+                  error: function (error) {
+                      alert("Error parsing CSV.");
+                      console.error(error);
+                  }
+              });
+          };
+          reader.readAsText(file);
+      } else {
+          alert("No file selected.");
+      }
+  });
 
     // Set up event listeners for this specific chart
     heightInput.addEventListener('change', (e) => {

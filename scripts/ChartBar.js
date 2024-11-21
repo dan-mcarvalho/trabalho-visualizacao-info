@@ -3,6 +3,7 @@ class ChartBar extends ChartConfig {
     addDataButton = document.getElementById("add-data-button");
     xInput = document.getElementById("x-input");
     yInput = document.getElementById("y-input");
+
   constructor(data) {
     super();
     this.data = data;
@@ -106,8 +107,57 @@ class ChartBar extends ChartConfig {
               alert("Por favor, insira uma categoria válida e um valor numérico.");
           }
       });
-
   }
+
+  parseCSV(csvData, config={}) {
+    const {
+      width = 1000,
+      height = 600,
+      margin = { top: 20, right: 30, bottom: 50, left: 50 },
+      labelX = "Categoria",
+      labelY = "Valor",
+    } = config;
+    Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function (result) {
+            const originalData = result.data;
+            const filteredData = originalData.filter(row => row.category && row.value);
+
+            if (filteredData.length < originalData.length) {
+                alert(`Warning: ${originalData.length - filteredData.length} rows with missing data were skipped.`);
+            }
+
+            barData = filteredData
+                .map(row => ({
+                    category: row.category,
+                    value: parseFloat(row.value)
+                }))
+                .filter(d => !isNaN(d.value));
+
+            if (barData.length < filteredData.length) {
+                alert(`Warning: ${filteredData.length - barData.length} rows with invalid value data were skipped.`);
+            }
+
+            if (barData.length > 0) {
+                const chart = new ChartBar(barData);
+                chart.create("#chart", barData, {
+                    width: width + margin.left + margin.right,
+                    height: height + margin.top + margin.bottom,
+                    margin: margin,
+                    labelX: labelX || "Categoria",
+                    labelY: labelY || "Valor"
+                });
+            } else {
+                alert('No valid data to display.');
+            }
+        },
+        error: function (error) {
+            console.error('Error parsing CSV:', error);
+            alert('Error parsing CSV file.');
+        }
+    });
+}
 
   remove() {
     d3.select("#chart")
@@ -126,6 +176,11 @@ class ChartBar extends ChartConfig {
     const newAddDataButton = this.addDataButton.cloneNode(true);
     this.addDataButton.parentNode.replaceChild(newAddDataButton, this.addDataButton);
     this.addDataButton = newAddDataButton;
+
+    const newCsvUploadInput = this.csvUploadInput.cloneNode(true);
+    this.csvUploadInput.parentNode.replaceChild(newCsvUploadInput, this.csvUploadInput);
+    this.csvUploadInput = newCsvUploadInput;
+
     super.remove()
   }
 }

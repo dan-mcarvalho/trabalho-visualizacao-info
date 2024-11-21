@@ -14,6 +14,7 @@ class ChartConfig {
     margin = { top: 20, right: 30, bottom: 30, left: 40 };
     width = 1000 - this.margin.left - this.margin.right;
     height = 600 - this.margin.top - this.margin.bottom;
+    csvUploadInput = document.getElementById('csv-input');
 
     loadConfigEvents(chartReference) {
         this.heightInput.addEventListener('change', (e) => {
@@ -49,26 +50,32 @@ class ChartConfig {
         });
 
 
-      //   this.addDataButton.addEventListener('click', () => {
-      //     const newCategory = this.categoryInput.value.trim();
-      //     const newValue = parseFloat(this.valueInput.value);
-      
-      //     if (newCategory && !isNaN(newValue)) {
-      //         const existingData = chartReference.data.find(d => d.category === newCategory);
-      //         if (existingData) {
-      //             existingData.value = newValue;
-      //         } else {
-      //             chartReference.data.push({ category: newCategory, value: newValue });
-      //         }        
-      //         chartReference.create("#chart", chartReference.data, { width: this.width + this.margin.left + this.margin.right, height: this.height + this.margin.top + this.margin.bottom, margin: this.margin });
-      
-      //         // Limpar os inputs
-      //         this.categoryInput.value = '';
-      //         this.valueInput.value = '';
-      //     } else {
-      //         alert("Por favor, insira uma categoria válida e um valor numérico.");
-      //     }
-      // });
+        // this.csvUploadInput.addEventListener('change', this.handleFileSelect());
+
+        this.csvUploadInput.addEventListener('change', (event) => this.handleFileSelect(event, chartReference));
+        
+    }
+
+    readCSV(file, chartReference) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const csv = reader.result;
+            chartReference.parseCSV(csv);
+        };
+        reader.onerror = function (e) {
+            console.error('Error reading file:', e);
+        };
+        reader.readAsText(file);
+    } 
+
+    handleFileSelect(event, chartReference) {
+        if(!event) return;
+        const file = event.target.files[0];
+        if (file) {
+            this.readCSV(file, chartReference);
+        } else {
+            alert('Nenhum arquivo selecionado.');
+        }
     }
 
     remove() {
@@ -91,6 +98,10 @@ class ChartConfig {
       const newAddDataButton = this.addDataButton.cloneNode(true);
       this.addDataButton.parentNode.replaceChild(newAddDataButton, this.addDataButton);
       this.addDataButton = newAddDataButton;
+
+      const newCsvUploadInput = this.csvUploadInput.cloneNode(true);
+      this.csvUploadInput.parentNode.replaceChild(newCsvUploadInput, this.csvUploadInput);
+      this.csvUploadInput = newCsvUploadInput;
     }
 
 }

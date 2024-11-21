@@ -74,12 +74,15 @@ class ChartHeatmap extends ChartConfig {
     svg.selectAll(".domain").remove();
 }
 
+parseCSV(csvData, config = {}) {
+    //todo
+    console.log(csvData, config);
+  }
 
   loadUpdateEvents() {
     this.addDataButton.addEventListener('click', () => {
         const xValue = parseFloat(this.xInput.value);
         const yValue = parseFloat(this.yInput.value);
-        console.log(!isNaN(xValue) && !isNaN(yValue));
     
         if (!isNaN(xValue) && !isNaN(yValue)) {
             this.data.push({ Sales: xValue, Profit: yValue });
