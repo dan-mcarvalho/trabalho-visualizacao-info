@@ -185,36 +185,84 @@ createNewChartButton.addEventListener('click', () => {
     heightInput.addEventListener('change', (e) => {
         const newHeight = parseInt(e.target.value);
         if (!isNaN(newHeight)) {
-            newActiveChart.create(chartHolder, newActiveChart.data, { height: newHeight });
+            newActiveChart.create(chartHolder, newActiveChart.data, { 
+                width: parseInt(widthInput.value) || 1000,
+                height: newHeight,
+                margin: {
+                    top: parseInt(marginInput.value) || 20,
+                    right: parseInt(marginInput.value) || 20, 
+                    bottom: parseInt(marginInput.value) || 20,
+                    left: parseInt(marginInput.value) || 20
+                },
+                labelX: labelXInput.value || "Categoria",
+                labelY: labelYInput.value || "Valor"
+            });
         }
     });
 
     marginInput.addEventListener('change', (e) => {
         const newMargin = parseInt(e.target.value);
         if (!isNaN(newMargin)) {
-            const margin = { top: newMargin, right: newMargin, bottom: newMargin, left: newMargin };
-            newActiveChart.create(chartHolder, newActiveChart.data, { margin });
+            newActiveChart.create(chartHolder, newActiveChart.data, {
+                width: parseInt(widthInput.value) || 1000,
+                height: parseInt(heightInput.value) || 600,
+                margin: {
+                    top: newMargin,
+                    right: newMargin,
+                    bottom: newMargin,
+                    left: newMargin
+                },
+                labelX: labelXInput.value || "Categoria",
+                labelY: labelYInput.value || "Valor"
+            });
         }
     });
 
     widthInput.addEventListener('change', (e) => {
         const newWidth = parseInt(e.target.value);
         if (!isNaN(newWidth)) {
-            newActiveChart.create(chartHolder, newActiveChart.data, { width: newWidth });
+            newActiveChart.create(chartHolder, newActiveChart.data, {
+                width: newWidth,
+                height: parseInt(heightInput.value) || 600,
+                margin: {
+                    top: parseInt(marginInput.value) || 20,
+                    right: parseInt(marginInput.value) || 20,
+                    bottom: parseInt(marginInput.value) || 20,
+                    left: parseInt(marginInput.value) || 20
+                },
+                labelX: labelXInput.value || "Categoria",
+                labelY: labelYInput.value || "Valor"
+            });
         }
     });
 
     labelXInput.addEventListener('change', (e) => {
-        newActiveChart.create(chartHolder, newActiveChart.data, { 
-            labelX: e.target.value, 
-            labelY: labelYInput.value 
+        newActiveChart.create(chartHolder, newActiveChart.data, {
+            width: parseInt(widthInput.value) || 1000,
+            height: parseInt(heightInput.value) || 600,
+            margin: {
+                top: parseInt(marginInput.value) || 20,
+                right: parseInt(marginInput.value) || 20,
+                bottom: parseInt(marginInput.value) || 20,
+                left: parseInt(marginInput.value) || 20
+            },
+            labelX: e.target.value,
+            labelY: labelYInput.value || "Valor"
         });
     });
 
     labelYInput.addEventListener('change', (e) => {
-        newActiveChart.create(chartHolder, newActiveChart.data, { 
-            labelY: e.target.value, 
-            labelX: labelXInput.value 
+        newActiveChart.create(chartHolder, newActiveChart.data, {
+            width: parseInt(widthInput.value) || 1000,
+            height: parseInt(heightInput.value) || 600,
+            margin: {
+                top: parseInt(marginInput.value) || 20,
+                right: parseInt(marginInput.value) || 20,
+                bottom: parseInt(marginInput.value) || 20,
+                left: parseInt(marginInput.value) || 20
+            },
+            labelX: labelXInput.value || "Categoria",
+            labelY: e.target.value
         });
     });
 
