@@ -19,7 +19,14 @@ const availableCharts = [
       data: heatmapData, //in datasets.js
     },
   ];
-const updateChart = (type) => {
+const updateChart = async (type) => {
+    const superstore = await fetch('superstore.csv')
+    .then(response => response.text())
+    .catch(error => {
+        console.error('Error loading superstore.csv:', error);
+        return null;
+    });
+
   const types = ["bar", "scatter", "heatmap"];
   if (currentChart && currentChart.type !== type) {
     currentChart.remove();
@@ -39,6 +46,10 @@ const updateChart = (type) => {
   });
 
   const chart = availableCharts.find((chart) => chart.type === type);
+
+  if (superstore) {
+    chart.data = superstore;
+  }
 
   if (chart) {
     currentChart = new chart.class(chart.data);

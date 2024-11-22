@@ -21,6 +21,11 @@ class ChartBar extends ChartConfig {
         labelY = "Valor",
       } = config;
 
+      if (typeof data === 'string') {
+        this.parseCSV(data, config);
+        return;
+      }
+
       d3.select(selector).select("svg").remove();
 
       const svg = d3
@@ -114,26 +119,26 @@ class ChartBar extends ChartConfig {
       width = 1000,
       height = 600,
       margin = { top: 20, right: 30, bottom: 50, left: 50 },
-      labelX = "Categoria",
-      labelY = "Valor",
+      labelX = "Produto",
+      labelY = "Venda",
     } = config;
     Papa.parse(csvData, {
         header: true,
         skipEmptyLines: true,
         complete: function (result) {
             const originalData = result.data;
-            const filteredData = originalData.filter(row => row.category && row.value);
+            const filteredData = originalData.filter(row => row.Product && row.Sales);
 
             if (filteredData.length < originalData.length) {
                 alert(`Warning: ${originalData.length - filteredData.length} rows with missing data were skipped.`);
             }
 
             barData = filteredData
-                .map(row => ({
-                    category: row.category,
-                    value: parseFloat(row.value)
+                .map(row =>  ({
+                    category: row.Product,
+                    value: parseFloat(parseFloat(row.Sales).toFixed(2))
                 }))
-                .filter(d => !isNaN(d.value));
+
 
             if (barData.length < filteredData.length) {
                 alert(`Warning: ${filteredData.length - barData.length} rows with invalid value data were skipped.`);
@@ -145,8 +150,8 @@ class ChartBar extends ChartConfig {
                     width: width + margin.left + margin.right,
                     height: height + margin.top + margin.bottom,
                     margin: margin,
-                    labelX: labelX || "Categoria",
-                    labelY: labelY || "Valor"
+                    labelX: labelX || "Produto",
+                    labelY: labelY || "Venda"
                 });
             } else {
                 alert('No valid data to display.');
